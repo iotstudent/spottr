@@ -20,7 +20,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $query = Product::query();
+       $query = Product::with('category','subcategory','brand');
 
         $user = auth()->user();
 
@@ -252,7 +252,6 @@ class ProductController extends Controller
             return $this->handleApiException($e, 'Product deletion failed');
         }
     }
-
 
 
 

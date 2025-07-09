@@ -30,7 +30,7 @@ class ProductRequest extends Model
         'product_image_3',
         'product_image_4',
         'is_approved' ,
-        'comment' ,
+        'admin_comment' ,
 
     ];
 

@@ -24,13 +24,6 @@ class StoreRepresentativeRequest extends FormRequest
     {
         return [
 
-
-            'corporate_profile_id' => [
-                'required',
-                'exists:corporate_profiles,id',
-                Rule::unique('representatives', 'corporate_profile_id'),
-            ],
-
             'first_name' => 'required|string',
             'last_name' => 'required|string',
             'job_title' => 'required|string',

@@ -18,7 +18,8 @@ class BrandController extends Controller
 
     public function index(Request $request)
     {
-        $query = Brand::query();
+
+        $query = Brand::with('category','products.category', 'products.subcategory');
 
         $user = auth()->user();
 
@@ -56,7 +57,7 @@ class BrandController extends Controller
 
        try {
 
-            $brand = Brand::with('category')->findOrFail($id);
+             $brand = Brand::with('category')->findOrFail($id);
             return response()->json([
                 'status' => 'success',
                 'message' => 'Brand fetched successfully',

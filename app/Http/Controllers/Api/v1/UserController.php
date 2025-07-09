@@ -27,8 +27,9 @@ class UserController extends Controller
 
 
     public function index(Request $request){
+
         $authUser = auth()->user();
-        $query = \App\Models\User::with(['individualProfile', 'corporateProfile']);
+        $query = User::with(['individualProfile', 'corporateProfile']);
 
 
         if (!in_array($authUser->role, ['admin', 'super_admin'])) {
@@ -51,7 +52,7 @@ class UserController extends Controller
             $query->where('is_active', filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN));
         }
 
-       
+
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('user_name', 'LIKE', '%' . $request->search . '%')
@@ -184,6 +185,41 @@ class UserController extends Controller
 
     }
 
+    public function deactivateAccount(userDeactivationRequest $request){
+
+        $request->validated();
+
+        try {
+
+            $user = auth()->user();
+
+
+            DB::beginTransaction();
+
+            DeactivationRequest::create([
+                'user_id' => $user->id,
+                'reason' => $request->reason,
+                'comment' => $request->comment,
+            ]);
+
+
+            $user->deletion_scheduled_at = now()->addDays(30);
+            $user->save();
+
+            $user->delete();
+
+            DB::commit();
+
+            return response()->json(['status' => 'success', 'message' => 'Account deletion activated account Will be fully deleted in 30 days.'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleApiException($e, 'Account deactivation failed');
+        }
+    }
+
+
+
     public function validateTransactionPin(Request $request)
     {
         $request->validate([
@@ -263,38 +299,7 @@ class UserController extends Controller
         ],200);
     }
 
-    public function deactivateAccount(userDeactivationRequest $request){
 
-        $request->validated();
-
-        try {
-
-            $user = auth()->user();
-
-
-            DB::beginTransaction();
-
-            DeactivationRequest::create([
-                'user_id' => $user->id,
-                'reason' => $request->reason,
-                'comment' => $request->comment,
-            ]);
-
-
-            $user->deletion_scheduled_at = now()->addDays(30);
-            $user->save();
-
-            $user->delete();
-
-            DB::commit();
-
-            return response()->json(['status' => 'success', 'message' => 'Account deletion activated account Will be fully deleted in 30 days.'], 200);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->handleApiException($e, 'Account deactivation failed');
-        }
-    }
 
 
 
@@ -488,7 +493,7 @@ class UserController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Admin account created successfully. Login credentials have been sent via email.',
+                'message' => 'Admin account created successfully. Notification have been sent via email.',
                 'data' => $newUser
             ], 200);
         } catch (\Exception $e) {
@@ -531,6 +536,26 @@ class UserController extends Controller
     }
 
 
+
+    protected function generateUniqueUsername($input)
+    {
+
+        if (filter_var($input, FILTER_VALIDATE_EMAIL)) {
+            $base = Str::slug(explode('@', $input)[0]);
+        } else {
+            $base = Str::slug($input);
+        }
+
+        $username = $base;
+        $suffix = 1;
+
+        while (User::where('user_name', $username)->exists()) {
+            $username = $base . '-' . $suffix;
+            $suffix++;
+        }
+
+        return $username;
+    }
 
 
 }

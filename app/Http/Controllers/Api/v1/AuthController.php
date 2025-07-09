@@ -118,12 +118,22 @@ class AuthController extends Controller
 
             DB::commit();
 
-    
+
+            Mail::send('emails.verification', [
+                'name' => $user->user_name,
+                'otp' => $otp,
+                'email' => $user->email
+            ], function($message) use ($user) {
+                $message->to($user->email);
+                $message->subject('Verification Mail');
+            });
+
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Individual account created successfully. A verification code has been sent to ' . $user->email,
-                'data' =>$user], 200);
+                'data' =>$user
+            ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();

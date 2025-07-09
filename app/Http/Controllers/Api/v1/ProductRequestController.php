@@ -21,7 +21,8 @@ class ProductRequestController extends Controller
 
     public function index(Request $request)
     {
-        $query = ProductRequest::query();
+
+        $query = ProductRequest::with('category','subcategory');
 
         $user = auth()->user();
 
@@ -103,6 +104,7 @@ class ProductRequestController extends Controller
 
     public function approve(ApproveProductReqRequest $request, $id)
     {
+
         $data = $request->validated();
 
         DB::beginTransaction();
@@ -169,7 +171,7 @@ class ProductRequestController extends Controller
 
             $productRequest->update([
                 'is_approved' => false,
-                'admin_comment' => $request->comment,
+                'admin_comment' => $request->admin_comment,
             ]);
 
             DB::commit();

@@ -23,7 +23,6 @@ class StoreFeedbackRequest extends FormRequest
     {
         return [
 
-            'user_id' => 'required|exists:users,id',
             'category' => 'required|string',
             'description' => 'sometimes|nullable|string',
             'screen_shot' => 'sometimes|nullable|mimes:jpeg,jpg,png|max:10240',

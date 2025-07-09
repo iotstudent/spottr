@@ -9,7 +9,7 @@ use App\Traits\HandlesApiExceptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ProductListing;
-use App\Models\Product;
+
 
 class ProductListingController extends Controller
 {
@@ -21,7 +21,7 @@ class ProductListingController extends Controller
     {
         $user = auth()->user();
 
-        $query = ProductListing::query()->with(['product', 'user']);
+        $query = ProductListing::query()->with(['product','product.category','product.subcategory','user']);
 
         if ($user && $user->isIndividual() && $user->profile->type === 'seller') {
             $query->where('user_id', $user->id);
@@ -44,7 +44,7 @@ class ProductListingController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Product listings fetched successfully',
-            'data' => $listings->items(),
+            'data' => $listings->getCollection(),
             'pagination' => [
                 'current_page' => $listings->currentPage(),
                 'next_page_url' => $listings->nextPageUrl(),
@@ -230,7 +230,6 @@ class ProductListingController extends Controller
             return $this->handleApiException($e, 'Failed to update listing image.');
         }
     }
-
 
     public function destroy($id)
     {
