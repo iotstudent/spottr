@@ -105,6 +105,27 @@ class User extends Authenticatable
         return $this->hasMany(ProductListing::class);
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)->where('is_active', true);
+    }
+
+    public function bankaccounts()
+    {
+        return $this->hasMany(BankAccount::class);
+    }
+
+    public function defaultBankaccount()
+    {
+        return $this->hasMany(BankAccount::class)->where('is_default', true);
+    }
+
+
 
     public function isCorporate()
     {

@@ -80,7 +80,7 @@ class UserController extends Controller
     public function getProfile(){
         try {
 
-            $user = auth()->user()->fresh();
+            $user = auth()->user()->fresh()->load(['activeSubscription.subscriptionPlan']);
 
             return response()->json([
                 'status' => 'success',

@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bank_accounts', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->uuid('benefit_id'); 
-            $table->string('bank_code');
-            $table->string('bank_name');
-            $table->string('account_number');
-            $table->string('account_name');
-            $table->boolean('is_default')->default(false);
+            $table->enum('type', ['credit', 'debit']); // Credit or Debit
+            $table->enum('format', ['fiat', 'crypto']); // Fiat or Crypto
+            $table->string('purpose'); // wallet-top-up, purchase, etc.
+            $table->decimal('amount', 15, 2);
+            $table->enum('status', ['pending', 'successful', 'failed'])->default('pending');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bank_accounts');
+        Schema::dropIfExists('transactions');
     }
 };

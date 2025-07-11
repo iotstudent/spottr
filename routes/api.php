@@ -11,6 +11,11 @@ use App\Http\Controllers\Api\v1\CategoryController;
 use App\Http\Controllers\Api\v1\SubCategoryController;
 use App\Http\Controllers\Api\v1\RepresentativeController;
 use App\Http\Controllers\Api\v1\FeedBackController;
+use App\Http\Controllers\Api\v1\SubscriptionController;
+use App\Http\Controllers\Api\v1\SubscriptionPlanController;
+use App\Http\Controllers\Api\v1\BankAccountController;
+use App\Http\Controllers\Api\v1\PaymentController;
+use App\Http\Controllers\Api\v1\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -44,6 +49,18 @@ Route::group(['prefix' => 'v1'], function () {
 
     });
 
+    Route::group(['prefix' => 'subscription-plans'], function(){
+
+        Route::get('/', [SubscriptionPlanController::class, 'index']);
+
+
+    });
+
+    Route::get('/get-banks', [BankAccountController::class, 'getBanks']);
+    Route::post('/verify-bank-account', [BankAccountController::class, 'verifyBankAccount']);
+
+
+
 
     Route::group(['middleware' => 'auth:sanctum'], function(){
 
@@ -54,6 +71,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::apiResource('sub_categories', SubCategoryController::class);
         Route::apiResource('representatives', RepresentativeController::class);
         Route::apiResource('feedbacks', FeedbackController::class);
+        Route::apiResource('subscription-plans', SubscriptionPlanController::class)->except(['index']);
 
         Route::group(['prefix' => 'users'], function(){
 
@@ -80,6 +98,15 @@ Route::group(['prefix' => 'v1'], function () {
 
 
 
+        });
+
+        Route::group(['prefix' => 'bank-accounts'], function(){
+
+            Route::post('/create', [BankAccountController::class, 'store']);
+            Route::get('/', [BankAccountController::class, 'index']);
+            Route::get('/user/{userId}', [BankAccountController::class, 'getByUser']);
+            Route::patch('/default/{id}', [BankAccountController::class, 'setDefault']);
+            Route::delete('/{id}', [BankAccountController::class, 'destroy']);
         });
 
         Route::group(['prefix' => 'representatives'], function(){
@@ -118,6 +145,41 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/', [ProductRequestController::class, 'store']);
             Route::post('/approve/{id}', [ProductRequestController::class, 'approve']);
             Route::post('/reject/{id}', [ProductRequestController::class, 'reject']);
+
+        });
+
+        Route::group(['prefix' => 'subscription-plans'], function(){
+
+            Route::post('/{subscription_plan}/upload-image', [SubscriptionPlanController::class, 'uploadImage']);
+            Route::patch('/{subscription_plan}/toggle', [SubscriptionPlanController::class, 'toggleActivation']);
+            Route::post('/{subscription_plan}/add-feature', [SubscriptionPlanController::class, 'addFeature']);
+            Route::delete('/{subscription_plan}/remove-feature/{feature}', [SubscriptionPlanController::class, 'removeFeature']);
+
+        });
+
+        Route::group(['prefix' => 'payments'], function(){
+            Route::post('/initiate/wallet-top-up/fiat', [PaymentController::class, 'initiateWalletTopUp']);
+            Route::post('/verify/fiat', [PaymentController::class, 'verifyFiatPayment']);
+        });
+
+        Route::group(['prefix' => 'subscriptions'], function(){
+
+            Route::get('/', [SubscriptionController::class, 'index']);
+            Route::post('/', [SubscriptionController::class, 'store']);
+
+
+        });
+
+        Route::group(['prefix' => 'into-wallet-transactions'], function(){
+
+            Route::get('/', [TransactionController::class, 'index']);
+
+        });
+
+
+        Route::group(['prefix' => 'transactions'], function(){
+
+            Route::get('/', [TransactionController::class, 'indexTransaction']);
 
         });
 

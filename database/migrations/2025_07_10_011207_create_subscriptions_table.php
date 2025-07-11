@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bank_accounts', function (Blueprint $table) {
+        Schema::create('subscriptions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->uuid('benefit_id'); 
-            $table->string('bank_code');
-            $table->string('bank_name');
-            $table->string('account_number');
-            $table->string('account_name');
-            $table->boolean('is_default')->default(false);
+            $table->foreignUuid('subscription_plan_id')->constrained('subscription_plans')->onDelete('cascade');
+            $table->foreignUuid('transaction_id')->constrained('transactions')->onDelete('cascade');
+            $table->integer('duration_months');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bank_accounts');
+        Schema::dropIfExists('subscriptions');
     }
 };
