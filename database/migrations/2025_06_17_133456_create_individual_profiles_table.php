@@ -17,8 +17,13 @@ return new class extends Migration
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('address')->nullable();
+            $table->string('store_address')->nullable();
+            $table->string('store_name')->nullable();
+            $table->longText('store_desc')->nullable();
+            $table->string('store_phone')->nullable();
+            $table->string('store_bg_image')->nullable();
             $table->longText('bio')->nullable();
-             $table->enum('type', ['seller','buyer']);
+            $table->enum('type', ['seller','buyer']);
             $table->enum('verification_level', ['0','1','2','3']);
             $table->timestamps();
         });

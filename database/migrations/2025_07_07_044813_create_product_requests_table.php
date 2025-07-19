@@ -26,10 +26,10 @@ return new class extends Migration
             $table->string('tags')->nullable();
             $table->decimal('price', 15, 2)->nullable();
             $table->string('product_code')->nullable();
-            $table->string('product_image_1')->nullable();
-            $table->string('product_image_2')->nullable();
-            $table->string('product_image_3')->nullable();
-            $table->string('product_image_4')->nullable();
+            $table->string('product_image_one')->nullable();
+            $table->string('product_image_two')->nullable();
+            $table->string('product_image_three')->nullable();
+            $table->string('product_image_four')->nullable();
             $table->boolean('is_approved')->nullable();
             $table->text('admin_comment')->nullable();
             $table->timestamps();

@@ -132,6 +132,93 @@ class UserController extends Controller
         }
     }
 
+    public function updateStore(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user->isIndividual() || $user->profile->type !== 'seller') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only sellers can update store.'
+            ], 403);
+        }
+
+        $data = $request->validate([
+            'address' => 'nullable|string',
+            'store_name' => 'nullable|string',
+            'store_desc' => 'nullable|string',
+            'store_email' => 'nullable|string',
+            'store_phone' => 'nullable|string',
+            'store_bg_image' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:10240',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $profile = $user->profile;
+
+            // Handle image upload if present
+            if ($request->hasFile('store_bg_image')) {
+                $imagePath = $request->file('store_bg_image')->store('store_backgrounds', 'public');
+                $data['store_bg_image'] = $imagePath;
+            }
+
+            $profile->update($data);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Store profile updated successfully.',
+                'data' => $profile
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleApiException($e, 'Failed to update store profile.');
+        }
+    }
+
+    public function updateStoreBgImage(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user->isIndividual() || $user->profile->type !== 'seller') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only sellers can update store.'
+            ], 403);
+        }
+
+        $data = $request->validate([
+            'store_bg_image' => 'required|image|mimes:jpeg,jpg,png|max:10240',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $profile = $user->profile;
+
+
+            $imagePath = $request->file('store_bg_image')->store('store_backgrounds', 'public');
+            $data['store_bg_image'] = $imagePath;
+
+
+            $profile->update($data);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Store backgrond image updated successfully.',
+                'data' => $profile->store_bg_image
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleApiException($e, 'Failed to update store profile.');
+        }
+    }
 
 
 

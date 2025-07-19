@@ -25,10 +25,10 @@ class ProductRequest extends Model
         'tags',
         'price',
         'product_code',
-        'product_image_1',
-        'product_image_2',
-        'product_image_3',
-        'product_image_4',
+        'product_image_one',
+        'product_image_two',
+        'product_image_three',
+        'product_image_four',
         'is_approved' ,
         'admin_comment' ,
 
@@ -60,22 +60,22 @@ class ProductRequest extends Model
 
 
 
-    public function getProductImage1Attribute($value)
+    public function getProductImageOneAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }
 
-    public function getProductImage2Attribute($value)
+    public function getProductImageTwoAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }
 
-    public function getProductImage3Attribute($value)
+    public function getProductImageThreeAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }
 
-    public function getProductImage4Attribute($value)
+    public function getProductImageFourAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }

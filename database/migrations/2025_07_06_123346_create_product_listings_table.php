@@ -18,9 +18,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('seller_unit_price', 15, 2);
             $table->string('currency', 10)->default('NGN');
-            $table->string('image_1')->nullable();
-            $table->string('image_2')->nullable();
-            $table->string('image_3')->nullable();
+            $table->string('image_one')->nullable();
+            $table->string('image_two')->nullable();
+            $table->string('image_three')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

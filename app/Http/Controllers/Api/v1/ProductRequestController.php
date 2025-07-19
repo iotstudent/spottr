@@ -81,7 +81,7 @@ class ProductRequestController extends Controller
             }
 
 
-            foreach (['product_image_1', 'product_image_2', 'product_image_3', 'product_image_4'] as $field) {
+            foreach (['product_image_one', 'product_image_two', 'product_image_three', 'product_image_four'] as $field) {
                 if ($request->hasFile($field)) {
                     $data[$field] = $request->file($field)->store('product_images', 'public');
                 }

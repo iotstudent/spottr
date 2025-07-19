@@ -18,9 +18,9 @@ class ProductListing extends Model
         'description',
         'seller_unit_price',
         'currency',
-        'image_1',
-        'image_2',
-        'image_3',
+        'image_one',
+        'image_two',
+        'image_three',
         'is_active',
     ];
 
@@ -42,17 +42,17 @@ class ProductListing extends Model
 
 
 
-    public function getImage1Attribute($value)
+    public function getImageOneAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }
 
-    public function getImage2Attribute($value)
+    public function getImageTwoAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }
 
-    public function getImage3Attribute($value)
+    public function getImageThreeAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }

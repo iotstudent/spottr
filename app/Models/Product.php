@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\UUID;
-
+use Illuminate\Support\Facades\Log;
 class Product extends Model
 {
     use HasFactory,UUID;
@@ -27,10 +27,10 @@ class Product extends Model
         'is_available',
         'price',
         'product_code',
-        'product_image_1',
-        'product_image_2',
-        'product_image_3',
-        'product_image_4',
+        'product_image_one',
+        'product_image_two',
+        'product_image_three',
+        'product_image_four',
         'created_by_admin'
     ];
 
@@ -41,6 +41,8 @@ class Product extends Model
         'attribute' => 'array',
         'variants' => 'array',
     ];
+
+
 
 
     public function brand()
@@ -68,22 +70,23 @@ class Product extends Model
         return $this->hasMany(ProductListing::class);
     }
 
-    public function getProductImage1Attribute($value)
+    public function getProductImageOneAttribute($value)
+    {
+
+       return $value ? url('storage/' . $value) : null;
+    }
+
+    public function getProductImageTwoAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }
 
-    public function getProductImage2Attribute($value)
+    public function getProductImageThreeAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }
 
-    public function getProductImage3Attribute($value)
-    {
-        return $value ? url('storage/' . $value) : null;
-    }
-
-    public function getProductImage4Attribute($value)
+    public function getProductImageFourAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }

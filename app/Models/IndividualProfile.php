@@ -18,10 +18,20 @@ class IndividualProfile extends Model
         'type',
         'bio',
         'address',
+        'store_name',
+        'store_desc',
+        'store_email',
+        'store_phone',
+        'store_bg_image'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getStoreBgImageAttribute($value)
+    {
+        return $value ? url('storage/' . $value) : null;
     }
 }

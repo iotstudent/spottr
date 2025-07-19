@@ -82,6 +82,8 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('/', [UserController::class, 'getProfile']);
             Route::post('/change-password', [UserController::class, 'changePassword']);
             Route::post('/corporate/update/', [UserController::class, 'updateCorporate']);
+            Route::post('/store/update/', [UserController::class, 'updateStore']);
+            Route::post('/store/update/background-image', [UserController::class, 'updateStoreBgImage']);
             Route::delete('/deactivate', [UserController::class, 'deactivateAccount']);
             Route::post('/authorization', [UserController::class, 'authorizeUser']);
 
@@ -121,7 +123,7 @@ Route::group(['prefix' => 'v1'], function () {
 
             Route::get('/', [ProductController::class, 'index']);
             Route::get('/{id}', [ProductController::class, 'show']);
-            Route::get('/vendors/{id}', [ProductController::class, 'getListingsByProduct']);
+            Route::get('/vendors/{productId}', [ProductController::class, 'getListingsByProduct']);
             Route::post('/', [ProductController::class, 'store']);
             Route::post('/update/{id}', [ProductController::class, 'update']);
             Route::delete('/{id}', [ProductController::class, 'destroy']);

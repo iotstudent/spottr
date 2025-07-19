@@ -71,9 +71,9 @@ class ProductListingController extends Controller
             'description' => 'nullable|string',
             'seller_unit_price' => 'required|numeric',
             'location' => 'nullable|string',
-            'image_1' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:10240',
-            'image_2' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:10240',
-            'image_3' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:10240',
+            'image_one' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:10240',
+            'image_two' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:10240',
+            'image_three' => 'sometimes|nullable|image|mimes:jpeg,jpg,png|max:10240',
         ]);
 
         DB::beginTransaction();
@@ -89,7 +89,7 @@ class ProductListingController extends Controller
                 ], 400);
             }
 
-            foreach (['image_1', 'image_2', 'image_3'] as $imageField) {
+            foreach (['image_one', 'image_two', 'image_three'] as $imageField) {
                 if ($request->hasFile($imageField)) {
                     $data[$imageField] = $request->file($imageField)->store('listing_images', 'public');
                 }
@@ -195,7 +195,7 @@ class ProductListingController extends Controller
         }
 
         $data = $request->validate([
-            'image_field' => 'required|in:image_1,image_2,image_3',
+            'image_field' => 'required|in:image_one,image_two,image_three',
             'image' => 'required|image|mimes:jpeg,jpg,png|max:10240',
         ]);
 

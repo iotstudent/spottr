@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            
+
            $table->uuid('id')->primary();
 
             // Foreign UUIDs with constraints
@@ -35,10 +35,10 @@ return new class extends Migration
             $table->string('product_code')->unique();
 
             // Images
-            $table->string('product_image_1')->nullable();
-            $table->string('product_image_2')->nullable();
-            $table->string('product_image_3')->nullable();
-            $table->string('product_image_4')->nullable();
+            $table->string('product_image_one')->nullable();
+            $table->string('product_image_two')->nullable();
+            $table->string('product_image_three')->nullable();
+            $table->string('product_image_four')->nullable();
 
             $table->timestamps();
         });
