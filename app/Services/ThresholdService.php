@@ -32,104 +32,72 @@ class ThresholdService
         }
     }
 
-    // protected function generateAndStoreAddress($userId, $coin)
-    // {
-    //     $latestAddress = UserAddress::where('user_id', $userId)
-    //                         ->where('coin_type', $coin)
-    //                         ->orderByDesc('id')
-    //                         ->first();
-
-    //     $pathIndex = $latestAddress ? ((int) last(explode('/', $latestAddress->path)) + 1) : 0;
-
-    //     $walletId = match ($coin) {
-    //         'btc' => $this->btc_wallet,
-    //         'sol' => $this->sol_wallet,
-    //         default => throw new \InvalidArgumentException("Unsupported coin type: {$coin}"),
-    //     };
-
-    //     $response = Http::withBasicAuth($this->user_name, $this->password)
-    //         ->post("{$this->base_url}/generate-address", [
-    //             'wallet' => [
-    //                 'coin' => $coin,
-    //                 'walletId' => (int) $walletId,
-    //                 'allToken' => true
-    //             ],
-    //             'path' => $pathIndex
-    //         ]);
-
-    //     if ($response->successful() && $response->json('success')) {
-    //         $addressData = $response->json('data');
-
-    //         UserAddress::create([
-    //             'user_id' => $userId,
-    //             'coin_type' => $coin,
-    //             'address' => $addressData['address'],
-    //             'path' => $addressData['path']
-    //         ]);
-
-    //         return $addressData;
-    //     }
-
-    //     throw new \Exception('Address generation failed for ' . strtoupper($coin));
-    // }
-
     protected function generateAndStoreAddress($userId, $coin)
-{
-    $latestAddress = UserAddress::where('user_id', $userId)
-                        ->where('coin_type', $coin)
-                        ->orderByDesc('id')
-                        ->first();
+    {
+        $latestAddress = UserAddress::where('coin_type', $coin)->latest()->first();
 
-    $pathIndex = $latestAddress ? ((int) last(explode('/', $latestAddress->path)) + 1) : 0;
-
-    $walletId = match ($coin) {
-        'btc' => $this->btc_wallet,
-        'sol' => $this->sol_wallet,
-        default => throw new \InvalidArgumentException("Unsupported coin type: {$coin}"),
-    };
-
-    $url = "{$this->base_url}/generate-address";
-    $payload = [
-        'wallet' => [
-            'coin' => $coin,
-            'walletId' => (int) $walletId,
-            'allToken' => true
-        ],
-        'path' => $pathIndex
-    ];
-
-    Log::info("Generating address for user ID {$userId}, coin: {$coin}", [
-        'url' => $url,
-        'payload' => $payload
-    ]);
-
-    $response = Http::withBasicAuth($this->user_name, $this->password)
-        ->post($url, $payload);
-
-    if ($response->successful() && $response->json('success')) {
-        $addressData = $response->json('data');
-
-        UserAddress::create([
+        Log::info('Latest address lookup result', [
             'user_id' => $userId,
-            'coin_type' => $coin,
-            'address' => $addressData['address'],
-            'path' => $addressData['path']
+            'coin' => $coin,
+            'latestAddress' => $latestAddress
         ]);
 
-        Log::info("Successfully generated address for user ID {$userId}", [
-            'addressData' => $addressData
+      
+        if ($latestAddress) {
+            $parts = explode('/', $latestAddress->path);
+            $pathIndex = (int) array_pop($parts) + 1;
+        }
+
+        $walletId = match ($coin) {
+            'btc' => $this->btc_wallet,
+            'sol' => $this->sol_wallet,
+            default => throw new \InvalidArgumentException("Unsupported coin type: {$coin}"),
+        };
+
+        $url = "{$this->base_url}/generate-address";
+        $payload = [
+            'wallet' => [
+                'coin' => $coin,
+                'walletId' => (int) $walletId,
+                'allToken' => true
+            ],
+            'path' => $pathIndex
+        ];
+
+
+        Log::info("Generating address for user ID {$userId}, coin: {$coin}", [
+            'url' => $url,
+            'payload' => $payload,
+            'user_id' => $userId
         ]);
 
-        return $addressData;
+        $response = Http::withBasicAuth($this->user_name, $this->password)
+            ->post($url, $payload);
+
+        if ($response->successful() && $response->json('success')) {
+            $addressData = $response->json('data');
+
+            UserAddress::create([
+                'user_id' => $userId,
+                'coin_type' => $coin,
+                'address' => $addressData['address'],
+                'path' => $addressData['path']
+            ]);
+
+            Log::info("Successfully generated address for user ID {$userId}", [
+                'addressData' => $addressData
+            ]);
+
+            return $addressData;
+        }
+
+        Log::error("Failed to generate address for user ID {$userId}, coin: {$coin}", [
+            'response' => $response->json(),
+            'status' => $response->status()
+        ]);
+
+        throw new \Exception('Address generation failed for ' . strtoupper($coin));
     }
-
-    Log::error("Failed to generate address for user ID {$userId}, coin: {$coin}", [
-        'response' => $response->json(),
-        'status' => $response->status()
-    ]);
-
-    throw new \Exception('Address generation failed for ' . strtoupper($coin));
-}
 
     public function processTopUpWebhook(array $data)
     {
