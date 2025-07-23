@@ -13,12 +13,11 @@ class Transaction extends Model
     protected $fillable = [
 
         'user_id',
-        'type', // debit or credit
-        'format',// fiat or crypto
+        'type',
+        'format',
         'amount',
-        'currency',
-        'purpose',  // e.g., 'subscription', 'purchase', 'service'
-        'status',            // e.g., 'pending', 'completed', 'cancelled'
+        'purpose',
+        'status',
     ];
 
 

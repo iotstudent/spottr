@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 use \Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Traits\HandlesApiExceptions;
+use App\Services\ThresholdService;
 use App\Services\FlutterwaveService;
 use Illuminate\support\Str;
 use Illuminate\Http\Request;
@@ -101,6 +103,44 @@ class PaymentController extends Controller
             'message' => 'Wallet top-up successful',
         ], 200);
     }
+
+    public function verifyCryptoTopUp(Request $request, ThresholdService $thresholdService)
+{
+    $payload = $request->all();
+
+    try {
+        $result = $thresholdService->processTopUpWebhook($payload);
+
+        if ($result) {
+            Transaction::create([
+                'user_id' => $result['user']->id,
+                'type' => 'credit',
+                'format' => 'crypto',
+                'purpose' => 'crypto-wallet-top-up',
+                'amount' => $result['amount'],
+                'status' => 'successful',
+            ]);
+        }
+
+        return response()->json([
+            'status' => $result ? 'success' : 'ignored',
+            'message' => $result ? 'Crypto top-up processed.' : 'Webhook event ignored.',
+        ]);
+    } catch (\Throwable $e) {
+        Log::error('Threshold webhook failed', [
+            'error' => $e->getMessage(),
+            'payload' => $payload,
+        ]);
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Webhook processing failed.',
+        ], 500);
+    }
+}
+
+
+
 
 
 }

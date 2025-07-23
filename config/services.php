@@ -31,10 +31,20 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-        'flutterwave' => [
+    'flutterwave' => [
         'base_url' => env('FLUTTERWAVE_BASE_URL', 'https://api.flutterwave.com/v3'),
         'secret_key' => env('FLUTTERWAVE_SECRET_KEY'),
         'public_key' => env('FLUTTERWAVE_PUBLIC_KEY'),
+    ],
+
+
+     'threshold' => [
+        'base_url' => env('THRESHOLD_BASE_URL'),
+        'btc_wallet' => env('BTC_WALLET'),
+        'sol_wallet' => env('SOL_WALLET'),
+        'usdc_wallet' => env('USDC_WALLET'),
+        'user_name' => env('THRESHOLD_USERNAME'),
+        'password' => env('THRESHOLD_PASSWORD'),
     ],
 
 ];

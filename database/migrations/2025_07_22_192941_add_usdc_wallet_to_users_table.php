@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->decimal('fiat_wallet', 15, 2)->default(0)->after('verification_expiry');
-            $table->decimal('clique_token_wallet', 30, 8)->default(0)->after('fiat_wallet');
-            $table->string('transaction_pin')->nullable()->after('crypto_wallet');
-              $table->string('transaction_pin_otp')->nullable()->after('transaction_pin');
+            $table->decimal('usdc_wallet', 30, 8)->default(0)->after('clique_token_wallet');
         });
     }
 
@@ -25,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['fiat_wallet', 'crypto_wallet', 'transaction_pin']);
+            $table->dropColumn('usdc_wallet');
         });
     }
 };

@@ -28,7 +28,8 @@ class User extends Authenticatable
         'email_verified_at',
         'is_active',
         'fiat_wallet',
-        'crypto_wallet',
+        'clique_token_wallet',
+        'usdc_wallet',
         'transaction_pin',
         'transaction_pin_otp',
         'created_by_admin',
@@ -94,6 +95,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(CorporateProfile::class);
     }
+
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
 
     public function feedbacks()
     {

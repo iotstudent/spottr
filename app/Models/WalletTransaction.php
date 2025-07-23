@@ -15,12 +15,12 @@ class WalletTransaction extends Model
         'user_id',
         'tx_ref',
         'transaction_id',
-        'type',// credit and debit
-        'format',//fiat or crypto
+        'type',
+        'format',
         'provider',
         'amount',
         'currency',
-        'payment_status',   // e.g., 'pending', 'successful', 'failed'
+        'payment_status',
         'payment_method',
 
     ];

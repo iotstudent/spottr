@@ -16,10 +16,16 @@ use App\Http\Controllers\Api\v1\SubscriptionPlanController;
 use App\Http\Controllers\Api\v1\BankAccountController;
 use App\Http\Controllers\Api\v1\PaymentController;
 use App\Http\Controllers\Api\v1\TransactionController;
+use App\Http\Controllers\Api\v1\UserAddressController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::group(['prefix' => 'v1'], function () {
+
+      Route::group(['prefix' => 'threshold'], function(){
+
+            Route::post('/', [PaymentController::class, 'verifyCryptoTopUp']);
+        });
 
     Route::group(['prefix' => 'auth'], function () {
 
@@ -178,12 +184,21 @@ Route::group(['prefix' => 'v1'], function () {
 
         });
 
-
         Route::group(['prefix' => 'transactions'], function(){
 
             Route::get('/', [TransactionController::class, 'indexTransaction']);
 
         });
+
+        Route::group(['prefix' => 'crypto-addresses'], function(){
+
+            Route::get('/', [UserAddressController::class, 'index']);
+
+
+        });
+
+
+
 
     });
 

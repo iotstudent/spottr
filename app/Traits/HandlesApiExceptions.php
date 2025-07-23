@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Traits;
-
 use Illuminate\Support\Facades\Log;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 trait HandlesApiExceptions
