@@ -105,39 +105,39 @@ class PaymentController extends Controller
     }
 
     public function verifyCryptoTopUp(Request $request, ThresholdService $thresholdService)
-{
-    $payload = $request->all();
+    {
+        $payload = $request->all();
 
-    try {
-        $result = $thresholdService->processTopUpWebhook($payload);
+        try {
+            $result = $thresholdService->processTopUpWebhook($payload);
 
-        if ($result) {
-            Transaction::create([
-                'user_id' => $result['user']->id,
-                'type' => 'credit',
-                'format' => 'crypto',
-                'purpose' => 'crypto-wallet-top-up',
-                'amount' => $result['amount'],
-                'status' => 'successful',
+            if ($result) {
+                Transaction::create([
+                    'user_id' => $result['user']->id,
+                    'type' => 'credit',
+                    'format' => 'crypto',
+                    'purpose' => 'crypto-wallet-top-up',
+                    'amount' => $result['amount'],
+                    'status' => 'successful',
+                ]);
+            }
+
+            return response()->json([
+                'status' => $result ? 'success' : 'ignored',
+                'message' => $result ? 'Crypto top-up processed.' : 'Webhook event ignored.',
             ]);
+        } catch (\Throwable $e) {
+            Log::error('Threshold webhook failed', [
+                'error' => $e->getMessage(),
+                'payload' => $payload,
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Webhook processing failed.',
+            ], 500);
         }
-
-        return response()->json([
-            'status' => $result ? 'success' : 'ignored',
-            'message' => $result ? 'Crypto top-up processed.' : 'Webhook event ignored.',
-        ]);
-    } catch (\Throwable $e) {
-        Log::error('Threshold webhook failed', [
-            'error' => $e->getMessage(),
-            'payload' => $payload,
-        ]);
-
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Webhook processing failed.',
-        ], 500);
     }
-}
 
 
 

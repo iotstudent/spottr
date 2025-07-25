@@ -22,6 +22,7 @@ return new class extends Migration
             $table->longText('store_desc')->nullable();
             $table->string('store_phone')->nullable();
             $table->string('store_bg_image')->nullable();
+            $table->string('store_profile_image')->nullable();
             $table->longText('bio')->nullable();
             $table->enum('type', ['seller','buyer']);
             $table->enum('verification_level', ['0','1','2','3']);

@@ -22,7 +22,8 @@ class IndividualProfile extends Model
         'store_desc',
         'store_email',
         'store_phone',
-        'store_bg_image'
+        'store_bg_image',
+        'store_profile_image'
     ];
 
     public function user()
@@ -31,6 +32,11 @@ class IndividualProfile extends Model
     }
 
     public function getStoreBgImageAttribute($value)
+    {
+        return $value ? url('storage/' . $value) : null;
+    }
+
+    public function getStoreProfileImageAttribute($value)
     {
         return $value ? url('storage/' . $value) : null;
     }

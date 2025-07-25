@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\UserAddress;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Http;
 
 class ThresholdService
@@ -42,7 +43,7 @@ class ThresholdService
             'latestAddress' => $latestAddress
         ]);
 
-      
+
         if ($latestAddress) {
             $parts = explode('/', $latestAddress->path);
             $pathIndex = (int) array_pop($parts) + 1;
@@ -99,25 +100,35 @@ class ThresholdService
         throw new \Exception('Address generation failed for ' . strtoupper($coin));
     }
 
+
     public function processTopUpWebhook(array $data)
     {
+        // Log the full payload
+        Log::info("Top-up webhook received:", $data);
 
-        if (($data['type'] ?? '') !== 'receive' || ($data['transactionStatus']['primaryStatus'] ?? '') !== 'success'){
+        // Send raw email directly
+        Mail::raw('Webhook Data: ' . json_encode($data, JSON_PRETTY_PRINT), function ($message) {
+            $message->to('nwanoziep@gmail.com')
+                    ->subject('Top-up Webhook Notification');
+        });
 
+        if (($data['type'] ?? '') !== 'receive' || ($data['transactionStatus']['primaryStatus'] ?? '') !== 'success') {
+            Log::info("Webhook ignored: type or status invalid.");
             return;
-
         }
 
-        $coin = strtoupper($data['coin'] ?? '');
-        $address = $data['externaladdress'] ?? null;
+        $coin = strtolower($data['coin'] ?? '');
+        $outputs = $data['outputs'] ?? [];
+        $address = collect($outputs)->firstWhere('isMine', true)['address'] ?? null;
+
         $amount = $data['effectivechange'] ?? null;
 
-        if (!$address || !$amount || !in_array($coin, ['BTC', 'SOL'])) {
+        if (!$address || !$amount || !in_array($coin, ['btc', 'sol'])) {
+            Log::warning("Missing or invalid data: address = $address, amount = $amount, coin = $coin");
             return;
         }
 
-
-        $userAddress = UserAddress::where('address', $address)->where('coin', $coin)->first();
+        $userAddress = UserAddress::where('address', $address)->where('coin_type', $coin)->first();
 
         if (!$userAddress) {
             Log::warning("Top-up received but no user found for address: $address");
@@ -125,7 +136,6 @@ class ThresholdService
         }
 
         $user = $userAddress->user;
-
 
         $user->increment('clique_token_wallet', $amount);
 
@@ -136,7 +146,6 @@ class ThresholdService
             'amount' => $amount
         ];
     }
-
 
 
 }

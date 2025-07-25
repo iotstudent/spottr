@@ -87,9 +87,16 @@ Route::group(['prefix' => 'v1'], function () {
 
             Route::get('/', [UserController::class, 'getProfile']);
             Route::post('/change-password', [UserController::class, 'changePassword']);
+            
             Route::post('/corporate/update/', [UserController::class, 'updateCorporate']);
+
+            Route::post('/buyer/update/', [UserController::class, 'updateBuyer']);
+            Route::post('/buyer/update/profile-image', [UserController::class, 'updateBuyerProfileImage']);
+
             Route::post('/store/update/', [UserController::class, 'updateStore']);
             Route::post('/store/update/background-image', [UserController::class, 'updateStoreBgImage']);
+            Route::post('/store/update/profile-image', [UserController::class, 'updateStoreProfileImage']);
+
             Route::delete('/deactivate', [UserController::class, 'deactivateAccount']);
             Route::post('/authorization', [UserController::class, 'authorizeUser']);
 

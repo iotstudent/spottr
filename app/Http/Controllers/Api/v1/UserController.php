@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Traits\HandlesApiExceptions;
 use App\Http\Requests\updateCorporateRequest;
+use App\Http\Requests\updateBuyerRequest;
 use App\Http\Requests\userDeactivationRequest;
 use App\Http\Requests\changePasswordRequest;
 use App\Http\Requests\authorizeUserRequest;
@@ -132,6 +133,75 @@ class UserController extends Controller
         }
     }
 
+    public function updateBuyer(updateBuyerRequest $request){
+
+        $validated = $request->validated();
+
+        DB::beginTransaction();
+
+        try {
+
+            $user = auth()->user();
+
+            $userFields = ['email', 'phone'];
+            $profileFields = ['first_name', 'last_name'];
+
+
+            $userData = array_intersect_key($validated, array_flip($userFields));
+            $profileData = array_intersect_key($validated, array_flip($profileFields));
+
+            $user->update($userData);
+            $user->individualProfile()->update($profileData);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Profile updated successfully',
+                'data' => $user->fresh(),
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleApiException($e, 'Profile update failed');
+        }
+    }
+
+    public function updateBuyerProfileImage(Request $request)
+    {
+        $user = auth()->user();
+
+        $data = $request->validate([
+            'pic' => 'required|image|mimes:jpeg,jpg,png|max:10240',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+
+            $imagePath = $request->file('pic')->store('profile_images', 'public');
+            $data['pic'] = $imagePath;
+
+
+            $user->update($data);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Profile image updated successfully.',
+                'data' => $user->pic
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleApiException($e, 'Failed to update profile.');
+        }
+    }
+
+
+
     public function updateStore(Request $request)
     {
         $user = auth()->user();
@@ -219,6 +289,48 @@ class UserController extends Controller
             return $this->handleApiException($e, 'Failed to update store profile.');
         }
     }
+
+    public function updateStoreProfileImage(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user->isIndividual() || $user->profile->type !== 'seller') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only sellers can update store.'
+            ], 403);
+        }
+
+        $data = $request->validate([
+            'store_profile_image' => 'required|image|mimes:jpeg,jpg,png|max:10240',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $profile = $user->profile;
+
+
+            $imagePath = $request->file('store_profile_image')->store('store_profile_images', 'public');
+            $data['store_profile_image'] = $imagePath;
+
+
+            $profile->update($data);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Store profile image updated successfully.',
+                'data' => $profile->store_profile_image
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleApiException($e, 'Failed to update store profile.');
+        }
+    }
+
 
 
 
