@@ -55,6 +55,25 @@ class ProductListingController extends Controller
         ], 200);
     }
 
+    public function show($productLisitingId)
+    {
+        try{
+            $listing = ProductListing::with(['product','product.category','product.subcategory','user'])->findOrFail($productLisitingId);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Product listings fetched successfully',
+                'data' => $listing,
+
+            ], 200);
+
+        }catch (ModelNotFoundException $e) {
+            return $this->handleNotFound('Product Listing');
+        }
+    }
+
+
+
     public function store(Request $request)
     {
         $user = auth()->user();

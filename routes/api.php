@@ -87,7 +87,7 @@ Route::group(['prefix' => 'v1'], function () {
 
             Route::get('/', [UserController::class, 'getProfile']);
             Route::post('/change-password', [UserController::class, 'changePassword']);
-            
+
             Route::post('/corporate/update/', [UserController::class, 'updateCorporate']);
 
             Route::post('/buyer/update/', [UserController::class, 'updateBuyer']);
@@ -146,6 +146,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::group(['prefix' => 'product-listings'], function(){
 
             Route::get('/', [ProductListingController::class, 'index']);
+            Route::get('/{productLisitingId}', [ProductListingController::class, 'show']);
             Route::post('/update/{id}', [ProductListingController::class, 'update']);
             Route::post('/', [ProductListingController::class, 'store']);
             Route::patch('/activate-inactivate/{id}', [ProductListingController::class, 'toggleStatus']);
