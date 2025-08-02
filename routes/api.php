@@ -22,10 +22,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'v1'], function () {
 
-      Route::group(['prefix' => 'threshold'], function(){
+    Route::group(['prefix' => 'threshold'], function(){
 
-            Route::post('/', [PaymentController::class, 'verifyCryptoTopUp']);
-        });
+        Route::post('/', [PaymentController::class, 'verifyCryptoTopUp']);
+    });
 
     Route::group(['prefix' => 'auth'], function () {
 
@@ -175,7 +175,8 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::group(['prefix' => 'payments'], function(){
             Route::post('/initiate/wallet-top-up/fiat', [PaymentController::class, 'initiateWalletTopUp']);
-            Route::post('/verify/fiat', [PaymentController::class, 'verifyFiatPayment']);
+            Route::post('/initiate/wallet-top-up/fiat/mobile', [PaymentController::class, 'initiateWalletTopUpMobile']);
+            Route::get('/verify/fiat', [PaymentController::class, 'verifyFiatPayment'])->name('payment.callback');
         });
 
         Route::group(['prefix' => 'subscriptions'], function(){

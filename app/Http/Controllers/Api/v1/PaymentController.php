@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use \Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Http;
 use App\Traits\HandlesApiExceptions;
 use App\Services\ThresholdService;
 use App\Services\FlutterwaveService;
@@ -31,7 +32,7 @@ class PaymentController extends Controller
 
         $transaction = WalletTransaction::create([
             'user_id' => $user->id,
-            'tx_ref' => $request->tx_ref,
+            'tx_ref' => $tx_ref,
             'provider' =>'flutterwave',
             'type' => 'debit',
             'format' => 'fiat',
@@ -39,15 +40,85 @@ class PaymentController extends Controller
             'payment_status' => 'pending',
         ]);
 
+
+
+
         return response()->json([
             'status' => 'success',
             'message' => 'Transaction initialized successfully',
             'data' => [
                 'tx_ref' => $transaction->tx_ref,
                 'amount' => $transaction->amount,
-                'currency' => $transaction->currency,
+                'currency' => 'NGN',
             ],
         ]);
+    }
+
+
+    public function initiateWalletTopUpMobile(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1000',
+        ]);
+
+        $user = auth()->user();
+        $tx_ref = 'spottr-wallet-topup-' . Str::uuid();
+
+
+         $paymentData = [
+            'tx_ref' =>  $tx_ref ,
+            'amount' => $request->amount,
+            'currency' => 'NGN',
+            'redirect_url' => route('payment.callback'),
+            'payment_options' => 'card,banktransfer,ussd',
+            'customer' => [
+                'email' => $user->email
+            ],
+            'customizations' => [
+                'title' => 'Wallet Top Up',
+                'description' => 'Payment to top up fiat wallet',
+
+            ]
+        ];
+
+        $response = Http::withToken(env('FLUTTERWAVE_SECRET_KEY'))->post('https://api.flutterwave.com/v3/payments', $paymentData);
+
+        if ($response->successful()) {
+
+            $transaction = WalletTransaction::create([
+                'user_id' => $user->id,
+                'tx_ref' => $tx_ref,
+                'provider' =>'flutterwave',
+                'type' => 'debit',
+                'format' => 'fiat',
+                'amount' => $request->amount,
+                'payment_status' => 'pending',
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Transaction initialized successfully',
+                'data' => [
+                    'tx_ref' => $transaction->tx_ref,
+                    'amount' => $transaction->amount,
+                     'currency' => 'NGN',
+                    'payment_link' => $response['data']['link'],
+
+                ],
+            ]);
+
+        } else {
+            return response()->json([
+                'error' => 'Unable to initiate payment',
+                'details' => $response->json(),
+            ], 500);
+        }
+
+
+
+
+
+
     }
 
     public function verifyFiatPayment(Request $request, FlutterwaveService $flutterwaveService)
