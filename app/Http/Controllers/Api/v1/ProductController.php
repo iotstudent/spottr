@@ -130,7 +130,7 @@ class ProductController extends Controller
 
                 $data['created_by_admin'] = true;
 
-                $data['corporate_profile_id'] = null;
+                $data['corporate_profile_id'] ;
 
             } elseif ($user->role === 'corporate' && $user->corporateProfile) {
 

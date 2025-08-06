@@ -19,7 +19,7 @@ class SubCategoryController extends Controller
 
     public function index(Request $request)
     {
-        $query = SubCategory::query();
+        $query = SubCategory::with('category');
 
         if ($search = $request->query('search')) {
             $query->where('name', 'LIKE', '%' . $search . '%');
@@ -51,7 +51,7 @@ class SubCategoryController extends Controller
 
        try {
 
-            $subcategory = SubCategory::findOrFail($id);
+            $subcategory = SubCategory::with('category')->findOrFail($id);
             return response()->json([
                 'status' => 'success',
                 'message' => 'SubCategory fetched successfully',

@@ -23,6 +23,7 @@ class StoreProductRequest extends FormRequest
     {
         return [
 
+            'corporate_profile_id' => 'sometimes|exists:corporate_profiles,id',
             'brand_id' => 'nullable|exists:brands,id',
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',

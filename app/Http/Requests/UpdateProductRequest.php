@@ -23,6 +23,7 @@ class UpdateProductRequest extends FormRequest
     {
         return [
 
+            'corporate_profile_id' => 'sometimes|exists:corporate_profiles,id',
             'brand_id' => 'nullable|exists:brands,id',
             'name' => 'sometimes|required|string|max:255',
             'category_id' => 'sometimes|required|exists:categories,id',
