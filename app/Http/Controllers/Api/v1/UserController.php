@@ -25,8 +25,6 @@ class UserController extends Controller
 {
     use HandlesApiExceptions;
 
-
-
     public function index(Request $request){
 
         $authUser = auth()->user();
@@ -93,6 +91,24 @@ class UserController extends Controller
             return $this->handleApiException($e, 'Failed to fetch user profile');
         }
     }
+
+    public function show($id)
+    {
+        try {
+
+            $user = User::with(['individualProfile', 'corporateProfile'])->findOrFail($id);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User fetched successfully',
+                'data' => $user
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return $this->handleNotFound('User');
+        }
+    }
+
+
 
     public function updateCorporate(updateCorporateRequest $request){
 
@@ -451,7 +467,7 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function generateTransactionPinOtp(Request $request)
+    public function generateTransactionPinOtp()
     {
         $user = auth()->user();
 

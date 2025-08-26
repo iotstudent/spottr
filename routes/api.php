@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\v1\BankAccountController;
 use App\Http\Controllers\Api\v1\PaymentController;
 use App\Http\Controllers\Api\v1\TransactionController;
 use App\Http\Controllers\Api\v1\UserAddressController;
+use App\Http\Controllers\Api\v1\MembershipController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -62,6 +63,11 @@ Route::group(['prefix' => 'v1'], function () {
 
     });
 
+     Route::group(['prefix' => 'payments'], function(){
+            Route::get('/verify/fiat', [PaymentController::class, 'verifyFiatPayment'])->name('payment.callback');
+    });
+
+
     Route::get('/get-banks', [BankAccountController::class, 'getBanks']);
     Route::post('/verify-bank-account', [BankAccountController::class, 'verifyBankAccount']);
 
@@ -84,6 +90,7 @@ Route::group(['prefix' => 'v1'], function () {
 
             Route::get('/all', [UserController::class, 'index']);
 
+            Route::get('/{id}', [UserController::class, 'show']);
 
             Route::get('/', [UserController::class, 'getProfile']);
             Route::post('/change-password', [UserController::class, 'changePassword']);
@@ -101,7 +108,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/authorization', [UserController::class, 'authorizeUser']);
 
             Route::post('/check-transaction-pin', [UserController::class, 'validateTransactionPin']);
-            Route::get('/get-transaction-otp-pin', [UserController::class, 'generateTransactionPinOtp']);
+            Route::get('/send/transaction-otp-pin', [UserController::class, 'generateTransactionPinOtp']);
             Route::post('/change-transaction-pin', [UserController::class, 'confirmTransactionPinChange']);
 
 
@@ -176,7 +183,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::group(['prefix' => 'payments'], function(){
             Route::post('/initiate/wallet-top-up/fiat', [PaymentController::class, 'initiateWalletTopUp']);
             Route::post('/initiate/wallet-top-up/fiat/mobile', [PaymentController::class, 'initiateWalletTopUpMobile']);
-            Route::get('/verify/fiat', [PaymentController::class, 'verifyFiatPayment'])->name('payment.callback');
+            // Route::get('/verify/fiat', [PaymentController::class, 'verifyFiatPayment'])->name('payment.callback');
         });
 
         Route::group(['prefix' => 'subscriptions'], function(){
@@ -203,9 +210,23 @@ Route::group(['prefix' => 'v1'], function () {
 
             Route::get('/', [UserAddressController::class, 'index']);
 
-
         });
 
+        Route::group(['prefix' => 'memberships'], function(){
+
+            Route::get('/', [MembershipController::class, 'index']);
+
+            Route::post('/invite', [MembershipController::class, 'invite']);
+            Route::put('/revoke/{id}', [MembershipController::class, 'revoke']);
+            Route::delete('/remove/{id}', [MembershipController::class, 'removeMembership']);
+
+
+            Route::post('/apply', [MembershipController::class, 'apply']);
+            Route::put('/respond/{id}', [MembershipController::class, 'respond']);
+
+
+
+        });
 
 
 
