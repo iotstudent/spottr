@@ -116,7 +116,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/create/corporate', [UserController::class, 'createCorporateAccountByAdmin']);
             Route::post('/update/corporate/{id}', [UserController::class, 'updateCorporateAccountByAdmin']);
             Route::patch('/block-unblock/{id}', [UserController::class, 'UserActivation']);
-
+             Route::patch('/swith-type', [UserController::class, 'switchToBuyerOrSeller']);
 
 
 

@@ -217,6 +217,37 @@ class UserController extends Controller
     }
 
 
+    public function switchToBuyerOrSeller()
+    {
+        DB::beginTransaction();
+
+        try {
+            $user = auth()->user();
+
+            if ($user->individualProfile->type === 'seller') {
+                $user->individualProfile()->update(['type' => 'buyer']);
+                $new_role = 'buyer';
+            } else {
+                $user->individualProfile()->update(['type' => 'seller']);
+                $new_role = 'seller';
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "User switched to {$new_role} successfully",
+                'data' => $user->fresh(),
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleApiException($e, 'Profile switch failed');
+        }
+    }
+
+
+
 
     public function updateStore(Request $request)
     {
@@ -457,6 +488,7 @@ class UserController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Incorrect current transaction PIN.',
+                'first_time' => false
             ], 400);
         }
 

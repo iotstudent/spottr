@@ -59,6 +59,7 @@ class MembershipController extends Controller
     }
 
 
+
     public function invite(Request $request)
     {
         $request->validate([
@@ -175,9 +176,6 @@ class MembershipController extends Controller
             return $this->handleApiException($e, 'Failed to remove membership');
         }
     }
-
-
-
 
 
 
