@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\v1\PaymentController;
 use App\Http\Controllers\Api\v1\TransactionController;
 use App\Http\Controllers\Api\v1\UserAddressController;
 use App\Http\Controllers\Api\v1\MembershipController;
+use App\Http\Controllers\Api\v1\DistributionListController;
+use App\Models\DistributionList;
 use Illuminate\Support\Facades\Route;
 
 
@@ -116,7 +118,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/create/corporate', [UserController::class, 'createCorporateAccountByAdmin']);
             Route::post('/update/corporate/{id}', [UserController::class, 'updateCorporateAccountByAdmin']);
             Route::patch('/block-unblock/{id}', [UserController::class, 'UserActivation']);
-             Route::patch('/swith-type', [UserController::class, 'switchToBuyerOrSeller']);
+            Route::patch('/swith-type', [UserController::class, 'switchToBuyerOrSeller']);
 
 
 
@@ -219,10 +221,26 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('/invite', [MembershipController::class, 'invite']);
             Route::put('/revoke/{id}', [MembershipController::class, 'revoke']);
             Route::delete('/remove/{id}', [MembershipController::class, 'removeMembership']);
+            Route::patch('/change/status/{id}', [MembershipController::class, 'changeStatus']);
 
 
             Route::post('/apply', [MembershipController::class, 'apply']);
             Route::put('/respond/{id}', [MembershipController::class, 'respond']);
+
+
+
+        });
+
+        Route::group(['prefix' => 'distribution-lists'], function(){
+
+            Route::get('/', [DistributionListController::class, 'index']);
+            Route::get('/{id}', [DistributionListController::class, 'show']);
+            Route::post('/', [DistributionListController::class, 'store']);
+            Route::put('/{id}', [DistributionListController::class, 'update']);
+            Route::delete('/{id}', [DistributionListController::class, 'destroy']);
+
+            Route::post('members/add/{list}', [DistributionListController::class, 'addMembers']);
+            Route::delete('members/remove/{list}', [DistributionListController::class, 'removeMembers']);
 
 
 

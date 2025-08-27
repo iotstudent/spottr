@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('memberships', function (Blueprint $table) {
+        Schema::create('distribution_lists', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('corporate_id');
-            $table->uuid('seller_id');    
-            $table->enum('status', ['pending', 'accepted', 'rejected', 'revoked','suspended','blacklisted'])->default('pending');
-            $table->enum('initiated_by', ['corporate', 'seller']);
-            $table->longText('reason')->nullable();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('type');
             $table->timestamps();
 
             $table->foreign('corporate_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('seller_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('memberships');
+        Schema::dropIfExists('distribution_lists');
     }
 };

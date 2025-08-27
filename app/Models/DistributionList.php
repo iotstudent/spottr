@@ -6,25 +6,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\UUID;
 
-class Membership extends Model
+class DistributionList extends Model
 {
-   use HasFactory, UUID;
+    use HasFactory,UUID;
 
     protected $fillable = [
+
         'corporate_id',
-        'seller_id',
-        'status',
-        'reason',
-        'initiated_by'
+        'name',
+        'description',
+        'type',
+
     ];
+
 
     public function corporate()
     {
         return $this->belongsTo(User::class, 'corporate_id');
     }
 
-    public function seller()
+    public function members()
     {
-        return $this->belongsTo(User::class, 'seller_id');
+        return $this->hasMany(DistributionListMember::class, 'distribution_list_id');
     }
+    
 }

@@ -150,6 +150,49 @@ class MembershipController extends Controller
         }
     }
 
+    public function changeStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:accepted,suspended,blacklisted',
+        ]);
+
+        $authUser = auth()->user();
+
+        try {
+            $membership = Membership::findOrFail($id);
+
+            // Only corporate can change status
+            if (!$authUser->isCorporate() || $membership->corporate_id !== $authUser->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Only the corporate owning this membership can change its status.'
+                ], 403);
+            }
+
+            // Only accepted, suspended, or blacklisted can be toggled between each other
+            if (!in_array($membership->status, ['accepted', 'suspended', 'blacklisted'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Only accepted memberships can be changed to suspended or blacklisted, or restored from them.'
+                ], 400);
+            }
+
+            $membership->update(['status' => $request->status]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => "Membership status changed to {$request->status} successfully.",
+                'data' => $membership,
+            ], 200);
+
+        } catch (ModelNotFoundException $e) {
+            return $this->handleNotFound('Membership');
+        } catch (\Exception $e) {
+            return $this->handleApiException($e, 'Failed to change membership status');
+        }
+    }
+
+
     public function removeMembership($membershipId)
     {
         try {
